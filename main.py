@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Form, Request, Depends
+from fastapi import FastAPI, Form, Request, Depends , UploadFile , File
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -8,6 +8,10 @@ from sqlalchemy.orm import Session
 from database import Base, engine, get_db
 from models import Usuario, Escola
 from pydantic import BaseModel
+from sqlalchemy.exc import IntegrityError
+from pathlib import Path
+import shutil
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -104,6 +108,7 @@ async def editar_escola_fotos_html(request: Request, id: int, db: Session = Depe
     )
 
 
+
 # Atualização da escola
 class EscolaAtualizacao(BaseModel):
     nome_escola: str
@@ -131,24 +136,12 @@ async def atualizar_escola(
     return {"message": "Escola atualizada com sucesso"}
 
 
-## fotos
-@app.post("/escolas/{id}/edit")
-async def atualizar_escola_fotos(
-    id: int,
-    dados: EscolaAtualizacao,
-    db: Session = Depends(get_db),
-):
-    escola = db.query(Escola).filter(Escola.id == id).first()
-    if not escola:
-        raise HTTPException(status_code=404, detail="Escola não encontrada")
+# #############Rota para listar fotos de uma escola
 
-    escola.nome_escola = dados.nome_escola
-    escola.logradouro = dados.logradouro
-    escola.bairro = dados.bairro
-    escola.municipio = dados.municipio
-    db.commit()
+UPLOAD_DIR = Path("app/static/uploads")
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-    return {"message": "Escola atualizada com sucesso"}
+
 
 
 # Rota para logout

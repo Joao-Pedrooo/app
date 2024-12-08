@@ -31,16 +31,17 @@
               <div class="p-3 border rounded shadow-sm btn-primary text-wrap">
                 <div class="d-flex justify-content-between align-items-center text-wrap">
                   <div>
-                    <h5 class="mb-0">${escola.nome}</h5>
-                    <p class="mb-0"><strong>Logradouro:</strong> ${escola.bairro}</p>
+                    <h5 class="mb-0"><strong>Escola :</strong> ${escola.nome}</h5>
+                    <p class="mb-0"><strong>Logradouro :</strong> ${escola.logradouro}</p>
+                    <p class="mb-0"><strong>Bairro :</strong> ${escola.bairro}</p>
                   </div>
                   <div>
 
-                    <a href="/editar-escola-fotos?id=${escola.id}" class="btn btn-primary btn-sm">Executar Servico</a>
+                    <a href="/editar-escola-fotos?id=${escola.id}" id="${escola.id}"class="btn btn-primary btn-sm">Executar Servico</a>
                   </div>
 
                 </div>
-                <p class="mb-0"><strong>Logradouro:</strong> ${escola.logradouro}</p>
+
               </div>`;
 
             container.innerHTML += card;
