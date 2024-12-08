@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Form, Request, Depends , UploadFile , File
+from fastapi import FastAPI, Form, Request, Depends , UploadFile , File, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -11,7 +11,8 @@ from pydantic import BaseModel
 from sqlalchemy.exc import IntegrityError
 from pathlib import Path
 import shutil
-
+import os
+import uuid
 
 Base.metadata.create_all(bind=engine)
 
@@ -137,11 +138,7 @@ async def atualizar_escola(
 
 
 # #############Rota para listar fotos de uma escola
-
-UPLOAD_DIR = Path("app/static/uploads")
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-
-
+# Diretório para armazenar as imagens
 
 
 # Rota para logout

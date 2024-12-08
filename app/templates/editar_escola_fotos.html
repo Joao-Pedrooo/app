@@ -3,57 +3,190 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Editar Fotos</title>
-    <link href="../static/css/bootstrap.min.css" rel="stylesheet" />
+    <title>Gerenciar Fotos - {{ escola.nome_escola }}</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      .miniatura {
+        max-width: 100px;
+        max-height: 100px;
+        object-fit: cover;
+        margin-right: 10px;
+      }
+      .campo-container {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        background: #f9f9f9;
+      }
+      .campo-header {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+      }
+    </style>
   </head>
   <body>
-    {% extends "base.html" %} {% block title %}Login - Gestão de Projetos{%
-    endblock %} {% block content %}
-    <div>
-      <div class="container-fluid mt-5 border bg-light text-uppercase">
-        <h1 class="text-center">Editar Escola</h1>
-        <form>
-          <div class="mb-3 row p-3 border bg-light">
-            <label for="nome_escola" class="form-label row">Nome :</label>
-            <div class="row">{{ escola.nome_escola }}</div>
-          </div>
-          <div class="mb-3 row p-3 border bg-light">
-            <label for="logradouro" class="form-label row">Logradouro :</label>
-            <div class="row">{{ escola.logradouro }}</div>
-          </div>
-          <div class="mb-3 row p-3 border bg-light">
-            <label for="bairro" class="form-label row">Bairro: </label>
-            <div class="row">{{ escola.bairro }}</div>
-          </div>
-          <div class="mb-3 row p-3 border bg-light">
-            <label for="municipio" class="form-label row">Município :</label>
-            <div class="row">{{ escola.municipio }}</div>
-          </div>
-          <div class="btn mb-3 row">
-            <a
-              href="/editar-escola?id={{ escola.id }}"
-              class="btn btn-primary btn-sm"
-              >Editar dados Endereco</a
-            >
-          </div>
-
-        </form>
+    <div class="container mt-5">
+      <!-- Cabeçalho -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Gerenciar Fotos - {{ escola.nome_escola }}</h1>
+        <div>
+          <button class="btn btn-secondary" onclick="window.history.back()">Voltar</button>
+          <button class="btn btn-success" onclick="salvarTodos()">Salvar Tudo</button>
+        </div>
       </div>
-    </div>
-    <div class="text-center p-3">
-      <button type="button" class="btn btn-success" onclick="salvarEscola()">
-        Salvar
-      </button>
-      <button
-        type="button"
-        class="btn btn-secondary"
-        onclick="window.history.back();"
-      >
-        Voltar
-      </button>
+
+      <!-- Informações da Escola -->
+      <div class="mb-4">
+        <p><strong>Logradouro:</strong> {{ escola.logradouro }}</p>
+        <p><strong>Bairro:</strong> {{ escola.bairro }}</p>
+        <p><strong>Município:</strong> {{ escola.municipio }}</p>
+      </div>
+
+      <!-- Campos de imagens dinâmicos -->
+      <div id="campos-container">
+        <!-- Campos serão adicionados dinamicamente -->
+      </div>
+
+      <!-- Botão para adicionar novos campos -->
+      <button class="btn btn-primary my-3" onclick="adicionarCampo()">Adicionar Campo</button>
     </div>
 
-    <script></script>
-    {% endblock %}
+    <script>
+      const escolaId = {{ escola.id }};
+      let ultimoCampo = "A";
+
+      // Carregar fotos existentes do banco de dados
+      fetch(`/escolas/${escolaId}/fotos`)
+        .then((response) => response.json())
+        .then((data) => {
+          const container = document.getElementById("campos-container");
+          container.innerHTML = "";
+
+          const fotosAgrupadas = agruparPorCampo(data);
+          for (const [campo, fotos] of Object.entries(fotosAgrupadas)) {
+            adicionarBlocoCampo(campo, fotos);
+          }
+        });
+
+      // Agrupar fotos por campo
+        function agruparPorCampo(fotos) {
+          return fotos.reduce((agrupamento, foto) => {
+            agrupamento[foto.campo] = agrupamento[foto.campo] || [];
+            agrupamento[foto.campo].push(foto);
+            return agrupamento;
+          }, {});
+        }
+
+      // Adicionar um novo bloco de campo
+      function adicionarBlocoCampo(campo, fotos = []) {
+        const container = document.getElementById("campos-container");
+
+        const bloco = document.createElement("div");
+        bloco.classList.add("campo-container");
+
+        bloco.innerHTML = `
+          <div class="campo-header">Campo: ${campo}</div>
+          <div class="row">
+            <div class="col-md-6">
+              <label>Antes</label>
+              ${
+                fotos.find((f) => f.tipo === "antes")
+                  ? `
+                  <div>
+                    <img src="${fotos.find((f) => f.tipo === "antes").caminho_foto}" class="miniatura" />
+                    <button class="btn btn-sm btn-danger" onclick="removerImagem(${fotos.find((f) => f.id)})">Remover</button>
+                  </div>`
+                  : '<input type="file" class="form-control campo-arquivo-antes" data-tipo="antes" />'
+              }
+            </div>
+            <div class="col-md-6">
+              <label>Depois</label>
+              ${
+                fotos.find((f) => f.tipo === "depois")
+                  ? `
+                  <div>
+                    <img src="${fotos.find((f) => f.tipo === "depois").caminho_foto}" class="miniatura" />
+                    <button class="btn btn-sm btn-danger" onclick="removerImagem(${fotos.find((f) => f.id)})">Remover</button>
+                  </div>`
+                  : '<input type="file" class="form-control campo-arquivo-depois" data-tipo="depois" />'
+              }
+            </div>
+          </div>
+          <button class="btn btn-primary mt-2" onclick="salvarCampo('${campo}', this)">Salvar Campo</button>
+        `;
+
+        container.appendChild(bloco);
+      }
+
+      // Adicionar novo campo dinâmico
+      function adicionarCampo() {
+        adicionarBlocoCampo(ultimoCampo);
+        ultimoCampo = String.fromCharCode(ultimoCampo.charCodeAt(0) + 1);
+      }
+
+      // Salvar fotos de um campo específico
+      function salvarCampo(campo, button) {
+        const bloco = button.parentElement;
+        const arquivos = bloco.querySelectorAll("input[type='file']");
+        const formData = new FormData();
+
+        arquivos.forEach((input) => {
+          if (input.files.length > 0) {
+            formData.append("tipo", input.dataset.tipo);
+            formData.append("campo", campo);
+            formData.append("file", input.files[0]);
+          }
+        });
+
+        fetch(`/escolas/${escolaId}/fotos`, {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            alert("Fotos salvas com sucesso!");
+            location.reload();
+          });
+      }
+
+      // Salvar todas as fotos
+      function salvarTodos() {
+        const formData = new FormData();
+        const arquivos = document.querySelectorAll("input[type='file']");
+
+        arquivos.forEach((input) => {
+          if (input.files.length > 0) {
+            formData.append("file", input.files[0]);
+          }
+        });
+
+        fetch(`/escolas/${escolaId}/fotos/multiplo`, {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            alert("Todas as fotos foram salvas com sucesso!");
+            location.reload();
+          });
+      }
+
+      // Remover imagem específica
+      function removerImagem(fotoId) {
+        if (confirm("Deseja realmente remover esta imagem?")) {
+          fetch(`/fotos/${fotoId}`, { method: "DELETE" })
+            .then((response) => {
+              if (response.ok) {
+                alert("Imagem removida com sucesso!");
+                location.reload();
+              } else {
+                alert("Erro ao remover a imagem.");
+              }
+            });
+        }
+      }
+    </script>
   </body>
 </html>
