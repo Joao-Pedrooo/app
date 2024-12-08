@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editar Escola</title>
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet" />
+  </head>
+  <body>
+    {% extends "base.html" %} {% block title %}Login - Gestão de Projetos{%
+    endblock %} {% block content %}
+    <div class="container mt-5 text-center text-uppercase">
+      <h1>Editar Escola</h1>
+      <form id="editar-escola-form ">
+        <input type="hidden" id="escola-id" value="{{ escola.id }}" />
+        <div class="mb-3">
+          <label for="nome_escola" class="form-label">Nome</label>
+          <input
+            type="text"
+            class="form-control"
+            id="nome_escola"
+            value="{{ escola.nome_escola }}"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="logradouro" class="form-label">Logradouro</label>
+          <input
+            type="text"
+            class="form-control"
+            id="logradouro"
+            value="{{ escola.logradouro }}"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="bairro" class="form-label">Bairro</label>
+          <input
+            type="text"
+            class="form-control"
+            id="bairro"
+            value="{{ escola.bairro }}"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="municipio" class="form-label">Município</label>
+          <input
+            type="text"
+            class="form-control"
+            id="municipio"
+            value="{{ escola.municipio }}"
+          />
+        </div>
+        <button type="button" class="btn btn-success" onclick="salvarEscola()">
+          Salvar
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          onclick="window.history.back();"
+        >
+          Voltar
+        </button>
+      </form>
+    </div>
+
+    <script>
+      function salvarEscola() {
+        const id = document.getElementById("escola-id").value;
+        const nome_escola = document.getElementById("nome_escola").value;
+        const logradouro = document.getElementById("logradouro").value;
+        const bairro = document.getElementById("bairro").value;
+        const municipio = document.getElementById("municipio").value;
+
+        fetch(`/escolas/${id}/editar`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            nome_escola,
+            logradouro,
+            bairro,
+            municipio,
+          }),
+        })
+          .then((response) => {
+            if (response.ok) {
+              alert("Escola atualizada com sucesso!");
+              window.location.href = "/gestao_area_verde";
+            } else {
+              alert("Erro ao atualizar escola.");
+            }
+          })
+          .catch((error) => console.error("Erro:", error));
+      }
+    </script>
+    {% endblock %}
+  </body>
+</html>

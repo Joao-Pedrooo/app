@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "FastAPI Debug",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["main:app", "--reload"],
+      "env": {
+        "DATABASE_URL": "postgresql://root:root@db:5432/app_db"
+      },
+      "jinja": true
+    }
+  ]
+}

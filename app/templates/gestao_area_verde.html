@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../static/style.css" />
+    <title>App</title>
+  </head>
+  <body>
+    {% extends "base.html" %} {% block title %}Login - Gestão de Projetos{%
+    endblock %} {% block content %}
+
+    <div class="container mt-5">
+      <h1 class="text-center mb-4">Escolas</h1>
+      <div class="d-flex flex-column gap-3" id="escolas-container">
+        <!-- Os dados serão preenchidos dinamicamente -->
+      </div>
+    </div>
+
+    <script>
+      // Buscar lista de escolas da API
+      fetch("/escolas")
+        .then((response) => response.json())
+        .then((data) => {
+          const container = document.getElementById("escolas-container");
+          container.innerHTML = ""; // Limpa antes de adicionar os dados
+
+          data.forEach((escola) => {
+            const card = `
+              <div class="p-3 border rounded shadow-sm btn-primary text-wrap">
+                <div class="d-flex justify-content-between align-items-center text-wrap">
+                  <div>
+                    <h5 class="mb-0">${escola.nome}</h5>
+                    <p class="mb-0"><strong>Logradouro:</strong> ${escola.bairro}</p>
+                  </div>
+                  <div>
+
+                    <a href="/editar-escola-fotos?id=${escola.id}" class="btn btn-primary btn-sm">Executar Servico</a>
+                  </div>
+
+                </div>
+                <p class="mb-0"><strong>Logradouro:</strong> ${escola.logradouro}</p>
+              </div>`;
+
+            container.innerHTML += card;
+          });
+        })
+        .catch((error) => console.error("Erro ao buscar escolas:", error));
+    </script>
+
+    {% endblock %}
+  </body>
+</html>

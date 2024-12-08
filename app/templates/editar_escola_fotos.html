@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editar Escola</title>
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet" />
+  </head>
+  <body>
+    {% extends "base.html" %} {% block title %}Login - Gestão de Projetos{%
+    endblock %} {% block content %}
+    <div>
+      <div class="container-fluid mt-5 border bg-light text-uppercase">
+        <h1 class="text-center">Editar Escola</h1>
+        <form>
+          <div class="mb-3 row p-3 border bg-light">
+            <label for="nome_escola" class="form-label row">Nome :</label>
+            <div class="row">{{ escola.nome_escola }}</div>
+          </div>
+          <div class="mb-3 row p-3 border bg-light">
+            <label for="logradouro" class="form-label row">Logradouro :</label>
+            <div class="row">{{ escola.logradouro }}</div>
+          </div>
+          <div class="mb-3 row p-3 border bg-light">
+            <label for="bairro" class="form-label row">Bairro: </label>
+            <div class="row">{{ escola.bairro }}</div>
+          </div>
+          <div class="mb-3 row p-3 border bg-light">
+            <label for="municipio" class="form-label row">Município :</label>
+            <div class="row">{{ escola.municipio }}</div>
+          </div>
+          <div class="btn mb-3 row">
+            <a
+              href="/editar-escola?id={{ escola.id }}"
+              class="btn btn-primary btn-sm"
+              >Editar dados Endereco</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="text-center p-3">
+      <button type="button" class="btn btn-success" onclick="salvarEscola()">
+        Salvar
+      </button>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        onclick="window.history.back();"
+      >
+        Voltar
+      </button>
+    </div>
+
+    <script></script>
+    {% endblock %}
+  </body>
+</html>
