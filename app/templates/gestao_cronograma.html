@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestao de Cronograma</title>
+  </head>
+  <body>
+    {% extends "base.html" %} {% block title %}Login - Gestão de Projetos{%
+    endblock %} {% block content %}
+    <h1>Cronograma</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Número OS</th>
+          <th>Previsão Realização</th>
+          <th>Realizado</th>
+          <th>Escola</th>
+          <th>Prioridade</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cronograma in cronogramas %}
+        <tr>
+          <td>{{ cronograma.id }}</td>
+          <td>{{ cronograma.numero_os }}</td>
+          <td>{{ cronograma.previsao_realizacao }}</td>
+          <td>{{ "Sim" if cronograma.realizado else "Não" }}</td>
+          <td>{{ cronograma.escola.nome_escola }}</td>
+          <td>{{ cronograma.prioridade }}</td>
+          <td>
+            <a href="/editar-cronograma?id={{ cronograma.id }}">Editar</a> |
+            <a href="/deletar-cronograma?id={{ cronograma.id }}">Deletar</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% endblock %}
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

@@ -6,10 +6,11 @@ from fastapi.exceptions import HTTPException
 from starlette.responses import Response
 from sqlalchemy.orm import Session
 from database import Base, engine, get_db
-from models import Usuario, Escola
+from models import Usuario, Escola, Cronograma
 from pydantic import BaseModel
 from sqlalchemy.exc import IntegrityError
 from pathlib import Path
+from datetime import datetime
 import shutil
 import os
 import uuid
@@ -116,7 +117,52 @@ class EscolaAtualizacao(BaseModel):
     logradouro: str
     bairro: str
     municipio: str
+######################################## Cronograma #############################################
 
+# Schema para validação de entrada
+class CronogramaSchema(BaseModel):
+    numero_os: str
+    previsao_realizacao: datetime
+    realizado: bool = False
+    escola_id: int
+    email: str
+    bairro: str
+    metros: int
+    grupos: str
+    equipe_responsavel: str
+    gerado_os: bool = False
+    os_entregue: bool = False
+    observacao: str
+    mes_realizado: str
+    prioridade: int
+
+# Listar cronogramas
+@app.get("/cronogramas", response_model=list[CronogramaSchema])
+async def listar_cronogramas(db: Session = Depends(get_db)):
+    cronogramas = db.query(Cronograma).all()
+    return cronogramas
+
+# Adicionar ou atualizar cronograma
+@app.post("/cronogramas")
+async def criar_atualizar_cronograma(
+    dados: CronogramaSchema, db: Session = Depends(get_db)
+):
+    cronograma = db.query(Cronograma).filter(Cronograma.numero_os == dados.numero_os).first()
+    if cronograma:
+        for key, value in dados.dict().items():
+            setattr(cronograma, key, value)
+    else:
+        cronograma = Cronograma(**dados.dict())
+        db.add(cronograma)
+
+    db.commit()
+    return {"message": "Cronograma salvo com sucesso"}
+
+
+
+
+
+##################################################################################################
 ## editar
 @app.post("/escolas/{id}/editar")
 async def atualizar_escola(
