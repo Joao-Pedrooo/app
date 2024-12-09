@@ -8,36 +8,108 @@
   <body>
     {% extends "base.html" %} {% block title %}Login - Gestão de Projetos{%
     endblock %} {% block content %}
-    <h1>Cronograma</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Número OS</th>
-          <th>Previsão Realização</th>
-          <th>Realizado</th>
-          <th>Escola</th>
-          <th>Prioridade</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for cronograma in cronogramas %}
-        <tr>
-          <td>{{ cronograma.id }}</td>
-          <td>{{ cronograma.numero_os }}</td>
-          <td>{{ cronograma.previsao_realizacao }}</td>
-          <td>{{ "Sim" if cronograma.realizado else "Não" }}</td>
-          <td>{{ cronograma.escola.nome_escola }}</td>
-          <td>{{ cronograma.prioridade }}</td>
-          <td>
-            <a href="/editar-cronograma?id={{ cronograma.id }}">Editar</a> |
-            <a href="/deletar-cronograma?id={{ cronograma.id }}">Deletar</a>
-          </td>
-        </tr>
+    <div class="container mt-5">
+      <h1 class="text-center mb-4">Gestão de Cronogramas</h1>
+
+      <!-- Formulário de Pesquisa -->
+      <form method="GET" action="/gestao_cronograma" class="mb-4">
+        <div class="row">
+          <div class="col-md-8">
+            <input
+              type="text"
+              name="search"
+              class="form-control"
+              placeholder="Pesquisar por nome da escola"
+              value="{{ search }}"
+            >
+          </div>
+          <div class="col-md-4">
+            <button type="submit" class="btn btn-primary w-100">Pesquisar</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Botão para adicionar novo cronograma -->
+      <div class="d-flex justify-content-end mb-4">
+        <a href="/novo-cronograma" class="btn btn-primary">
+          <i class="bi bi-plus-circle"></i> Adicionar Novo Cronograma
+        </a>
+      </div>
+
+      <!-- Seção: Não Realizados -->
+      <h2 class="text-danger">Cronogramas Não Realizados</h2>
+      <div class="row">
+        {% if nao_realizados|length == 0 %}
+        <div class="alert alert-info text-center" role="alert">
+          Nenhum cronograma não realizado encontrado.
+        </div>
+        {% else %}
+        {% for cronograma in nao_realizados %}
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Escola: {{ cronograma.escola.nome_escola }}</h5>
+              <p class="card-text">
+                <strong>Previsão:</strong> {{ cronograma.previsao_realizacao.strftime('%d/%m/%Y') }}<br>
+                <strong>Email:</strong> {{ cronograma.email }}<br>
+                <strong>Bairro:</strong> {{ cronograma.bairro }}<br>
+                <strong>Prioridade:</strong>
+                <span class="badge {{ 'bg-danger' if cronograma.prioridade == 3 else 'bg-warning' if cronograma.prioridade == 2 else 'bg-light' }}">
+                  {{ "Alta" if cronograma.prioridade == 3 else "Média" if cronograma.prioridade == 2 else "Baixa" }}
+                </span>
+              </p>
+              <div class="d-flex justify-content-between">
+                <a href="/novo-cronograma?id={{ cronograma.id }}" class="btn btn-warning btn-sm">
+                  <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a href="/deletar-cronograma/{{ cronograma.id }}" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este cronograma?')">
+                  <i class="bi bi-trash"></i> Excluir
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
         {% endfor %}
-      </tbody>
-    </table>
+        {% endif %}
+      </div>
+
+      <!-- Seção: Realizados -->
+      <h2 class="text-success">Cronogramas Realizados</h2>
+      <div class="row">
+        {% if realizados|length == 0 %}
+        <div class="alert alert-info text-center" role="alert">
+          Nenhum cronograma realizado encontrado.
+        </div>
+        {% else %}
+        {% for cronograma in realizados %}
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Escola: {{ cronograma.escola.nome_escola }}</h5>
+              <p class="card-text">
+                <strong>Previsão:</strong> {{ cronograma.previsao_realizacao.strftime('%d/%m/%Y') }}<br>
+                <strong>Email:</strong> {{ cronograma.email }}<br>
+                <strong>Bairro:</strong> {{ cronograma.bairro }}<br>
+                <strong>Prioridade:</strong>
+                <span class="badge {{ 'bg-danger' if cronograma.prioridade == 3 else 'bg-warning' if cronograma.prioridade == 2 else 'bg-light' }}">
+                  {{ "Alta" if cronograma.prioridade == 3 else "Média" if cronograma.prioridade == 2 else "Baixa" }}
+                </span>
+              </p>
+              <div class="d-flex justify-content-between">
+                <a href="/novo-cronograma?id={{ cronograma.id }}" class="btn btn-warning btn-sm">
+                  <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a href="/deletar-cronograma/{{ cronograma.id }}" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este cronograma?')">
+                  <i class="bi bi-trash"></i> Excluir
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </div>
 
     {% endblock %}
     <script src="/static/js/bootstrap.bundle.min.js"></script>

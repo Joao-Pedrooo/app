@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestão de Cronograma</title>
+  </head>
+  <body>
+    {% extends "base.html" %}
+    {% block title %}Gestão de Cronograma{% endblock %}
+    {% block content %}
+    <div class="container mt-5">
+      <h1 class="text-center mb-4">
+        {% if cronograma %} Editar Cronograma {% else %} Adicionar Novo Cronograma {% endif %}
+      </h1>
+
+      <form method="POST" action="/salvar-cronograma">
+        <!-- ID Oculto -->
+        {% if cronograma %}
+        <input type="hidden" name="id" value="{{ cronograma.id }}">
+        {% endif %}
+
+        <!-- Número OS -->
+        <div class="mb-3">
+          <label for="numero_os" class="form-label">Número OS</label>
+          <input type="text" class="form-control" id="numero_os" name="numero_os"
+                 value="{{ cronograma.numero_os if cronograma else '' }}" required>
+        </div>
+
+        <!-- Previsão de Realização -->
+        <div class="mb-3">
+          <label for="previsao_realizacao" class="form-label">Previsão de Realização</label>
+          <input type="date" class="form-control" id="previsao_realizacao" name="previsao_realizacao"
+                 value="{{ cronograma.previsao_realizacao.strftime('%Y-%m-%d') if cronograma else '' }}" required>
+        </div>
+
+        <!-- Campo Realizado -->
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="realizado" name="realizado"
+                 {% if cronograma and cronograma.realizado %}checked{% endif %}>
+          <label class="form-check-label" for="realizado">Realizado</label>
+        </div>
+
+        <!-- Campo Escolas -->
+        <div class="mb-3">
+          <label for="escola_search" class="form-label">Escola</label>
+          <input
+            type="text"
+            id="escola_search"
+            class="form-control mb-2"
+            placeholder="Digite para buscar uma escola..."
+            list="escolas_list"
+            value="{% if cronograma and cronograma.escola %}{{ cronograma.escola.nome_escola }}{% endif %}"
+            autocomplete="off"
+          >
+          <datalist id="escolas_list">
+            {% for escola in escolas %}
+            <option value="{{ escola.nome_escola }}" data-id="{{ escola.id }}">
+              {{ escola.nome_escola }}
+            </option>
+            {% endfor %}
+          </datalist>
+          <input type="hidden" id="escola_id" name="escola_id"
+                 value="{{ cronograma.escola_id if cronograma else '' }}" required>
+        </div>
+
+        <script>
+          document.getElementById("escola_search").addEventListener("input", function () {
+            const input = this.value.toLowerCase();
+            const datalist = document.getElementById("escolas_list");
+            const options = datalist.options;
+
+            for (let i = 0; i < options.length; i++) {
+              if (options[i].value.toLowerCase() === input) {
+                document.getElementById("escola_id").value = options[i].dataset.id;
+                return;
+              }
+            }
+
+            document.getElementById("escola_id").value = "";
+          });
+        </script>
+
+        <!-- Outros Campos (Email, Bairro, etc.) -->
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" name="email"
+                 value="{{ cronograma.email if cronograma else '' }}">
+        </div>
+
+        <div class="mb-3">
+          <label for="bairro" class="form-label">Bairro</label>
+          <input type="text" class="form-control" id="bairro" name="bairro"
+                 value="{{ cronograma.bairro if cronograma else '' }}">
+        </div>
+
+        <div class="mb-3">
+          <label for="metros" class="form-label">Metros</label>
+          <input type="number" class="form-control" id="metros" name="metros"
+                 value="{{ cronograma.metros if cronograma else '' }}">
+        </div>
+
+        <div class="mb-3">
+          <label for="grupos" class="form-label">Grupos</label>
+          <input type="text" class="form-control" id="grupos" name="grupos"
+                 value="{{ cronograma.grupos if cronograma else '' }}">
+        </div>
+
+        <div class="mb-3">
+          <label for="equipe_responsavel" class="form-label">Equipe Responsável</label>
+          <input type="text" class="form-control" id="equipe_responsavel" name="equipe_responsavel"
+                 value="{{ cronograma.equipe_responsavel if cronograma else '' }}">
+        </div>
+
+        <!-- Checkbox Fields -->
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="gerado_os" name="gerado_os"
+                 {% if cronograma and cronograma.gerado_os %}checked{% endif %}>
+          <label class="form-check-label" for="gerado_os">Gerado OS</label>
+        </div>
+
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="os_entregue" name="os_entregue"
+                 {% if cronograma and cronograma.os_entregue %}checked{% endif %}>
+          <label class="form-check-label" for="os_entregue">OS Entregue</label>
+        </div>
+
+        <!-- Observação -->
+        <div class="mb-3">
+          <label for="observacao" class="form-label">Observação</label>
+          <textarea class="form-control" id="observacao" name="observacao" rows="3">
+            {{ cronograma.observacao if cronograma else '' }}
+          </textarea>
+        </div>
+
+        <!-- Campo Prioridade -->
+        <div class="mb-3">
+          <label for="prioridade" class="form-label">Prioridade</label>
+          <select class="form-select" id="prioridade" name="prioridade" required>
+            <option value="1" {% if cronograma and cronograma.prioridade == 1 %}selected{% endif %}>Baixa</option>
+            <option value="2" {% if cronograma and cronograma.prioridade == 2 %}selected{% endif %}>Média</option>
+            <option value="3" {% if cronograma and cronograma.prioridade == 3 %}selected{% endif %}>Alta</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-success">Salvar</button>
+      </form>
+    </div>
+    {% endblock %}
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

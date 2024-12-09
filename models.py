@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import relationship
 from database import Base
+from datetime import datetime
+
 
 class Usuario(Base):
     __tablename__ = "usuarios"
@@ -41,20 +43,23 @@ class OrdemServico(Base):
     status = Column(String)
 
 class Cronograma(Base):
-    __tablename__ = 'cronogramas'
+    __tablename__ = "cronogramas"
+
     id = Column(Integer, primary_key=True, index=True)
-    numero_os = Column(String, index=True)
-    previsao_realizacao = Column(DateTime, nullable=False)
-    realizado = Column(Boolean, default=False)
-    escola_id = Column(Integer, ForeignKey("escolas.id"))
-    email = Column(String)
-    bairro = Column(String)
-    metros = Column(Integer)
-    grupos = Column(String)
-    equipe_responsavel = Column(String)
-    gerado_os = Column(Boolean, default=False)
-    os_entregue = Column(Boolean, default=False)
-    observacao = Column(String)
-    mes_realizado = Column(String)
-    prioridade = Column(Integer)
+    numero_os = Column(String, index=True, nullable=False)  # Número de OS obrigatório
+    previsao_realizacao = Column(DateTime, nullable=False, default=datetime.now)  # Previsão obrigatória
+    realizado = Column(Boolean, default=False)  # Status realizado ou não
+    escola_id = Column(Integer, ForeignKey("escolas.id"), nullable=False)  # Chave estrangeira para Escola
+    email = Column(String, nullable=True)  # Email associado ao cronograma
+    bairro = Column(String, nullable=True)  # Bairro
+    metros = Column(Integer, nullable=True)  # Área em metros quadrados
+    grupos = Column(String, nullable=True)  # Grupos associados
+    equipe_responsavel = Column(String, nullable=True)  # Nome da equipe
+    gerado_os = Column(Boolean, default=False)  # Se OS foi gerado
+    os_entregue = Column(Boolean, default=False)  # Se OS foi entregue
+    observacao = Column(String, nullable=True)  # Observação
+    mes_realizado = Column(String, nullable=True)  # Mês em que foi realizado
+    prioridade = Column(Integer, nullable=True)  # Prioridade (1=Alta, 2=Média, 3=Baixa)
+
+    # Relacionamento com a tabela Escola
     escola = relationship("Escola", back_populates="cronogramas")
